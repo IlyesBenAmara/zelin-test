@@ -1,0 +1,17 @@
+services:
+  database:
+    image: "postgres:latest"
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: bookstore
+      POSTGRES_USER: bookseller
+      POSTGRES_PASSWORD: randompassword
+    networks:
+      - default
+
+  # backend:
+  # frontend:
+
+networks:
+  default:
