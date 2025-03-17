@@ -4,17 +4,17 @@ import { TBookID, TBookRead, TBookSearch, TBookWrite } from '../models/book';
 
 const getBook = async (req: Request, res: Response): Promise<any> => {
   try {
-    const bookId: TBookID = +req.params.id;
-    const book: TBookRead | null = await db.book.findUnique({
-      where: {
-        id: bookId,
-      },
-      select: {
-        id: true,
-        title: true,
-        genre: true,
-      },
-    });
+                    const bookId: TBookID = +req.params.id;
+                    const book: TBookRead | null = await db.book.findUnique({
+                      where: {
+                        id: bookId,
+                      },
+                      select: {
+                        id: true,
+                        title: true,
+                        genre: true,
+                      },
+                    });
     return res.status(200).json({ data: book });
   } catch (error) {
     res.status(500).json({ message: `error: ${error}` });
