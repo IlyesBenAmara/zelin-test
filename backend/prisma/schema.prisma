@@ -14,15 +14,15 @@ datasource db {
 }
 
 model Book {
-  id            Int      @id @default(autoincrement())
-  title         String
-  genre         String
-  datePublished DateTime
-  author        String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  Profile       Profile? @relation(fields: [profileId], references: [id])
-  profileId     Int?
+  id        Int      @id @default(autoincrement())
+  title     String
+  genre     String
+  author    String
+  note      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Profile   Profile? @relation(fields: [profileId], references: [id])
+  profileId Int?
 }
 
 model Profile {
@@ -30,7 +30,7 @@ model Profile {
   bio    String?
   user   User    @relation(fields: [userId], references: [id])
   userId Int     @unique
-  posts  Book[]
+  Books  Book[]
 }
 
 model User {
