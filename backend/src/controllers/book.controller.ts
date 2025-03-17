@@ -1,11 +1,10 @@
 import { Request, Response } from 'express';
 import { db } from '../utils/db';
-import { TBookID, TBookRead, TBookWrite } from '../models/book';
-import { TUserId } from '../models/user';
+import { TBookID, TBookRead, TBookSearch, TBookWrite } from '../models/book';
 
 const getBook = async (req: Request, res: Response): Promise<any> => {
   try {
-    const bookId: TBookID = parseInt(req.params.id, 10);
+    const bookId: TBookID = +req.params.id;
     const book: TBookRead | null = await db.book.findUnique({
       where: {
         id: bookId,
@@ -22,17 +21,28 @@ const getBook = async (req: Request, res: Response): Promise<any> => {
   }
 };
 
-const listBooksByUserId = async (req: Request, res: Response): Promise<any> => {
+const listUserBooks = async (req: Request, res: Response): Promise<any> => {
   try {
-    const userId: TUserId = parseInt(req.query.userId as string, 10);
+    const { userId, title }: TBookSearch = req.body;
+
+    const searchQuery =
+      title === ''
+        ? { userId }
+        : {
+            userId,
+            title: {
+              contains: title,
+            },
+          };
     const books: TBookRead[] | null = await db.book.findMany({
       where: {
-        profileId: userId,
+        ...searchQuery,
       },
       select: {
         id: true,
         title: true,
         genre: true,
+        note: true,
       },
     });
     return res.status(200).json({ data: books });
@@ -43,14 +53,14 @@ const listBooksByUserId = async (req: Request, res: Response): Promise<any> => {
 
 const updateBook = async (req: Request, res: Response): Promise<any> => {
   try {
-    const bookId: TBookID = parseInt(req.params.id, 10);
+    const bookId: TBookID = +req.params.id;
     const bookPayload: TBookWrite = req.body;
-    const { author, genre, profileId, title, note } = bookPayload;
+    const { author, genre, userId, title, note } = bookPayload;
     const book: TBookRead | null = await db.book.update({
       where: {
         id: bookId,
       },
-      data: { author, genre, profileId, title, note },
+      data: { author, genre, userId, title, note },
       select: {
         id: true,
         title: true,
@@ -67,16 +77,16 @@ const updateBook = async (req: Request, res: Response): Promise<any> => {
 const createBook = async (req: Request, res: Response): Promise<any> => {
   try {
     const bookPayload: TBookWrite = req.body;
-    const { author, genre, profileId, title, note } = bookPayload;
+    const { author, genre, userId, title, note } = bookPayload;
     const book: TBookRead | null = await db.book.create({
-      data: { author, genre, profileId, title, note },
+      data: { author, genre, userId, title, note },
       select: {
         id: true,
         title: true,
         genre: true,
       },
     });
-    return res.status(200).json({ data: book });
+    return res.status(201).json({ data: book });
   } catch (error) {
     res.status(500).json({ message: `error: ${error}` });
   }
@@ -84,7 +94,7 @@ const createBook = async (req: Request, res: Response): Promise<any> => {
 
 const deleteBook = async (req: Request, res: Response): Promise<any> => {
   try {
-    const bookId: TBookID = parseInt(req.params.id, 10);
+    const bookId: TBookID = +req.params.id;
     const book: TBookRead | null = await db.book.delete({
       where: {
         id: bookId,
@@ -101,4 +111,10 @@ const deleteBook = async (req: Request, res: Response): Promise<any> => {
   }
 };
 
-export default { getBook, listBooksByUserId, updateBook, createBook, deleteBook };
+export default {
+  getBook,
+  listUserBooks,
+  updateBook,
+  createBook,
+  deleteBook,
+};
