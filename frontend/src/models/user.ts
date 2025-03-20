@@ -7,3 +7,5 @@ export interface User {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export type TUserWrite = Omit<User, "id" | "createdAt" | "updatedAt">;

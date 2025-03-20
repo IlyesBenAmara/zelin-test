@@ -1,14 +1,7 @@
-class ApiClient {
-  async getUser() {}
-  async createUser() {}
-  async editUserDetails() {}
+import { Axios } from "axios";
 
-  async getBook() {}
-  async listUserBooks() {}
-  async createBook() {}
-  async updateBook() {}
+const apiClient = new Axios({
+  baseURL: import.meta.env.BASE_URL,
+});
 
-  asyncDeleteBook() {}
-}
-
-export default new ApiClient();
+export default apiClient;
