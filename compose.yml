@@ -7,11 +7,35 @@ services:
       POSTGRES_DB: bookstore
       POSTGRES_USER: bookseller
       POSTGRES_PASSWORD: randompassword
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U prisma -d postgres"]
+      interval: 5s
+      timeout: 2s
+      retries: 20
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     networks:
-      - default
+      - prisma-network
 
-  # backend:
-  # frontend:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    stdin_open: true
+    tty: true # Keeps the container running for debugging
+    depends_on:
+      database:
+        condition: service_healthy
+    env_file:
+      - .env
+    networks:
+      - prisma-network
+
+volumes:
+  postgres_data:
 
 networks:
-  default:
+  prisma-network:
+    name: prisma-network
